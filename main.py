@@ -4,6 +4,7 @@
 import cv2
 import numpy as np
 
+
 def read_image(filepath):
     return cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
 
@@ -11,7 +12,11 @@ def read_image(filepath):
 def calculate_target_fcn(in_image_path, ref_image_path):
     in_image = read_image(in_image_path)
     ref_image = read_image(ref_image_path)
-    TP = TN =  FP = FN = 0
+
+    if in_image.shape != ref_image.shape:
+        raise ValueError('images must have the same shape')
+
+    TP = TN = FP = FN = 0
     for i in range(0, ref_image.shape[0]):
         for j in range(0, ref_image.shape[1]):
             if ref_image[i][j] != 0 and in_image[i][j] != 0:
@@ -22,7 +27,7 @@ def calculate_target_fcn(in_image_path, ref_image_path):
                 TN += 1
             elif ref_image[i][j] == 0 and in_image[i][j] != 0:
                 FP += 1
-    return TP/(TP + FP + FN)
+    return TP / (TP + FP + FN)
 
 
 def calculate_pix_variance(image):
@@ -37,6 +42,18 @@ def calculate_pix_variance(image):
     return variance_matrix
 
 
+def get_random_indices(arr, k):
+    """Sample k random indices of an array without replacement.
+
+    Returns a k by n array, where n = arr.ndim
+    """
+
+    linear_indices = np.random.choice(arr.size, k, replace=False)
+    coordinates = np.unravel_index(linear_indices, arr.shape)
+    array_of_coordinates = np.stack(tuple(coordinates), 1)
+    return array_of_coordinates
+
+
 if __name__ == "__main__":
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
@@ -44,4 +61,10 @@ if __name__ == "__main__":
     cv2.imshow('test_window', img)
     cv2.waitKey(0)
     print(calculate_target_fcn(in_image_path, ref_image_path))
-    print(calculate_pix_variance(img))
+    variance = calculate_pix_variance(img)
+    print(variance)
+
+    ant_positions = get_random_indices(variance, 5)
+    print(f'ant_positions: {ant_positions}')
+
+    cv2.waitKey(0)
