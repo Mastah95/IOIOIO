@@ -1,5 +1,6 @@
 # FILENAME: main.py
 # AUTHORS: Jalocha, Kozlowski, Piekarski
+import random
 
 import cv2
 import numpy as np
@@ -52,6 +53,57 @@ def get_random_indices(arr, k):
     coordinates = np.unravel_index(linear_indices, arr.shape)
     array_of_coordinates = np.stack(tuple(coordinates), 1)
     return array_of_coordinates
+
+
+def get_neighbours(position, arr_shape):
+    """Return valid 8-connected neighbours of a given point in an array.
+
+    Positions are returned as a list of tuples.
+    """
+
+    offsets = (-1, 0, 1)
+    offsets_2d = ((y, x) for y in offsets for x in offsets
+                  if y != 0 or x != 0)
+
+    all_neighbours = ((position[0] + y, position[1] + x) for (y, x) in offsets_2d)
+
+    valid_neighbours = [(y, x) for (y, x) in all_neighbours
+                        if (0 <= y < arr_shape[0]) and (0 <= x < arr_shape[1])]
+
+    return valid_neighbours
+
+
+def get_transition_weight(position, alpha, beta, pheromone_matrix, variance_matrix):
+    """Get weight used to determine ant transition probabilities.
+
+    Probability of a pixel being selected as the transition target increases
+    with its variance and pheromone level.
+    """
+
+    pheromone = pheromone_matrix[position]
+    visibility = variance_matrix[position]
+
+    return pow(pheromone, alpha) * pow(visibility, beta)
+
+
+def get_next_move(position, pheromone_matrix, variance_matrix, alpha, beta):
+    """Return the next position that an ant should visit.
+
+    A pixel from the neighbourhood is drawn using weighted random sampling.
+    Probabilities are determined by pheromone and variance values at the
+    respective positions.
+    """
+
+    neighbours = get_neighbours(position, pheromone_matrix.shape)
+    weights = [get_transition_weight(pos, alpha, beta, pheromone_matrix, variance_matrix)
+               for pos in neighbours]
+
+    try:
+        neighbour = random.choices(neighbours, weights)
+    except IndexError:
+        neighbour = random.choices(neighbours)
+
+    return neighbour[0]
 
 
 def main():
