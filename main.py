@@ -54,7 +54,7 @@ def get_random_indices(arr, k):
     return array_of_coordinates
 
 
-if __name__ == "__main__":
+def main():
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
     img = read_image(ref_image_path)
@@ -68,3 +68,7 @@ if __name__ == "__main__":
     print(f'ant_positions: {ant_positions}')
 
     cv2.waitKey(0)
+
+
+if __name__ == "__main__":
+    main()
