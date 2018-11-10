@@ -107,18 +107,30 @@ def get_next_move(position, pheromone_matrix, variance_matrix, alpha, beta):
 
 
 def init_pheromone_matrix(image_shape, initial_value):
+    """Return initial pheromone matrix filled with constant value.
+
+    """
     pheromone_matrix = np.full((image_shape[0], image_shape[1]), initial_value)
 
     return pheromone_matrix
 
 
 def pheromone_matrix_update(pheromone_matrix, ant_positions, heuristic_matrix, evaporation_rate):
+    """Return updated pheromone matrix after ants movement.
+
+    After every step, the pheromone values are updated. Evaporation rate controls the degree of the
+    updating of matrix.
+    """
     for ant in ant_positions:
         pheromone_matrix[ant[0], ant[1]] = (1 - evaporation_rate) * pheromone_matrix[ant[0], ant[1]] + \
             evaporation_rate * heuristic_matrix[ant[0], ant[1]]
 
 
 def pheromone_matrix_decay(pheromone_matrix, initial_pheromone_matrix, pheromone_decay):
+    """ Return decayed pheromone matrix.
+
+    After the movement of all ants, the pheromone matrix is updated.
+    """
     for i in range(0, pheromone_matrix.shape[0]):
         for j in range(0, pheromone_matrix.shape[1]):
             pheromone_matrix[i][j] = (1 - pheromone_decay) * pheromone_matrix[i][j] + pheromone_decay * \
@@ -126,6 +138,11 @@ def pheromone_matrix_decay(pheromone_matrix, initial_pheromone_matrix, pheromone
 
 
 def make_decision(pheromone_matrix, epsilon):
+    """ Return a calculated threshold.
+
+    At the end of the algorithm, a binary decision has to be made at each pixel location to determine whether it
+    is edge or not, by applying a threshold on the final pheromone matrix.
+    """
     threshold = np.mean(pheromone_matrix)
     i = 0
     while True:
