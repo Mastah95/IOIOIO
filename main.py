@@ -149,7 +149,16 @@ def main():
     print(variance)
 
     ant_positions = get_random_indices(variance, 5)
+    pheromone = init_pheromone_matrix(img.shape, 0.2)
+    initial_pheromone = pheromone.copy()
+    heu = np.full(img.shape, 0.1)
+    pheromone_matrix_update(pheromone, ant_positions, heu, 0.3)
+    pheromone_matrix_decay(pheromone, initial_pheromone, 0.6)
+    T = make_decision(pheromone, 0.0001)
     print(f'ant_positions: {ant_positions}')
+    print(f'initial pheromone: {initial_pheromone}')
+    print(f'pheromone after iteration: {pheromone}')
+    print(f'Threshold: {T}')
 
     cv2.waitKey(0)
 
