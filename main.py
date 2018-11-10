@@ -125,6 +125,19 @@ def pheromone_matrix_decay(pheromone_matrix, initial_pheromone_matrix, pheromone
                                      initial_pheromone_matrix[i][j]
 
 
+def make_decision(pheromone_matrix, epsilon):
+    threshold = np.mean(pheromone_matrix)
+    i = 0
+    while True:
+        mi1 = np.mean(pheromone_matrix[pheromone_matrix >= threshold])
+        mi2 = np.mean(pheromone_matrix[pheromone_matrix < threshold])
+        new_threshold = (mi1 + mi2)/2
+        if (abs(threshold - new_threshold) < epsilon) or (i > 1000):
+            break
+        i = i + 1
+    return new_threshold
+
+
 def main():
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
