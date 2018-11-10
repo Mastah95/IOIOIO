@@ -112,6 +112,12 @@ def init_pheromone_matrix(image_shape, initial_value):
     return pheromone_matrix
 
 
+def pheromone_matrix_update(pheromone_matrix, ant_positions, heuristic_matrix, evaporation_rate):
+    for ant in ant_positions:
+        pheromone_matrix[ant[0], ant[1]] = (1 - evaporation_rate) * pheromone_matrix[ant[0], ant[1]] + \
+            evaporation_rate * heuristic_matrix[ant[0], ant[1]]
+
+
 def main():
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
