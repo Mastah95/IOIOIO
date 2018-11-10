@@ -106,6 +106,12 @@ def get_next_move(position, pheromone_matrix, variance_matrix, alpha, beta):
     return neighbour[0]
 
 
+def init_pheromone_matrix(image_shape, initial_value):
+    pheromone_matrix = np.full((image_shape[0], image_shape[1]), initial_value)
+
+    return pheromone_matrix
+
+
 def main():
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
