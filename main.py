@@ -106,6 +106,55 @@ def get_next_move(position, pheromone_matrix, variance_matrix, alpha, beta):
     return neighbour[0]
 
 
+def init_pheromone_matrix(image_shape, initial_value):
+    """Return initial pheromone matrix filled with constant value.
+
+    """
+    pheromone_matrix = np.full((image_shape[0], image_shape[1]), initial_value)
+
+    return pheromone_matrix
+
+
+def pheromone_matrix_update(pheromone_matrix, ant_positions, heuristic_matrix, evaporation_rate):
+    """Return updated pheromone matrix after ants movement.
+
+    After every step, the pheromone values are updated. Evaporation rate controls the degree of the
+    updating of matrix.
+    """
+    for ant in ant_positions:
+        pheromone_matrix[ant[0], ant[1]] = (1 - evaporation_rate) * pheromone_matrix[ant[0], ant[1]] + \
+            evaporation_rate * heuristic_matrix[ant[0], ant[1]]
+
+
+def pheromone_matrix_decay(pheromone_matrix, initial_pheromone_matrix, pheromone_decay):
+    """ Return decayed pheromone matrix.
+
+    After the movement of all ants, the pheromone matrix is updated.
+    """
+    for i in range(0, pheromone_matrix.shape[0]):
+        for j in range(0, pheromone_matrix.shape[1]):
+            pheromone_matrix[i][j] = (1 - pheromone_decay) * pheromone_matrix[i][j] + pheromone_decay * \
+                                     initial_pheromone_matrix[i][j]
+
+
+def make_decision(pheromone_matrix, epsilon):
+    """ Return a calculated threshold.
+
+    At the end of the algorithm, a binary decision has to be made at each pixel location to determine whether it
+    is edge or not, by applying a threshold on the final pheromone matrix.
+    """
+    threshold = np.mean(pheromone_matrix)
+    i = 0
+    while True:
+        mi1 = np.mean(pheromone_matrix[pheromone_matrix >= threshold])
+        mi2 = np.mean(pheromone_matrix[pheromone_matrix < threshold])
+        new_threshold = (mi1 + mi2)/2
+        if (abs(threshold - new_threshold) < epsilon) or (i > 1000):
+            break
+        i = i + 1
+    return new_threshold
+
+
 def main():
     in_image_path = 'input_data/house_prewitt.png'
     ref_image_path = 'input_data/house_prewitt.png'
@@ -117,7 +166,16 @@ def main():
     print(variance)
 
     ant_positions = get_random_indices(variance, 5)
+    pheromone = init_pheromone_matrix(img.shape, 0.2)
+    initial_pheromone = pheromone.copy()
+    heu = np.full(img.shape, 0.1)
+    pheromone_matrix_update(pheromone, ant_positions, heu, 0.3)
+    pheromone_matrix_decay(pheromone, initial_pheromone, 0.6)
+    T = make_decision(pheromone, 0.0001)
     print(f'ant_positions: {ant_positions}')
+    print(f'initial pheromone: {initial_pheromone}')
+    print(f'pheromone after iteration: {pheromone}')
+    print(f'Threshold: {T}')
 
     cv2.waitKey(0)
 
