@@ -6,13 +6,24 @@ import cv2
 import numpy as np
 
 
+class AlgorithmParameters:
+    def __init__(self, img):
+        self.alpha = 6.0
+        self.beta = 0.001
+        self.heu_matrix = np.full(img.shape, 0.1)
+        self.init_pheromones = init_pheromone_matrix(img.shape, 0.0001)
+        self.number_of_ants = int(np.sqrt((img.shape[0]*img.shape[1])))
+        self.evaporation_rate = 0.1
+        self.pheromone_decay = 0.005
+        self.max_iter = 1000
+        self.epsilon = 0.01
+
+
 def read_image(filepath):
     return cv2.imread(filepath, cv2.IMREAD_GRAYSCALE)
 
 
-def calculate_target_fcn(in_image_path, ref_image_path):
-    in_image = read_image(in_image_path)
-    ref_image = read_image(ref_image_path)
+def calculate_target_fcn(in_image, ref_image):
 
     if in_image.shape != ref_image.shape:
         raise ValueError('images must have the same shape')
@@ -106,6 +117,11 @@ def get_next_move(position, pheromone_matrix, variance_matrix, alpha, beta):
     return neighbour[0]
 
 
+def move_ants(ant_matrix, pheromone_matrix, variance_matrix, alpha, beta):
+    for i, ant in enumerate(ant_matrix):
+        ant_matrix[i] = get_next_move(ant, pheromone_matrix, variance_matrix, alpha, beta)
+
+
 def init_pheromone_matrix(image_shape, initial_value):
     """Return initial pheromone matrix filled with constant value.
 
@@ -164,28 +180,50 @@ def determine_edges(pheromone_matrix, epsilon):
     return im_edges
 
 
+def run_one_iteration(ant_matrix, pheromone_matrix, variance_matrix, algorithm_parameters):
+    move_ants(ant_matrix, pheromone_matrix, variance_matrix, algorithm_parameters.alpha, algorithm_parameters.beta)
+    pheromone_matrix_update(pheromone_matrix, ant_matrix,
+                            algorithm_parameters.heu_matrix, algorithm_parameters.evaporation_rate)
+    pheromone_matrix_decay(pheromone_matrix, algorithm_parameters.init_pheromones, algorithm_parameters.pheromone_decay)
+
+
+def run_algorithm(im_in, im_ref, parameters, is_verbose):
+    assert(im_in.shape == im_ref.shape)
+
+    ant_matrix = get_random_indices(im_in, parameters.number_of_ants)
+    pheromone_matrix = parameters.init_pheromones.copy()
+    variance_matrix = calculate_pix_variance(im_in)
+    best_target_fcn = 0
+    im_out = np.zeros(im_in.shape, np.uint8)
+
+    for i in range(0, parameters.max_iter):
+        run_one_iteration(ant_matrix, pheromone_matrix, variance_matrix, parameters)
+        im_temp = determine_edges(pheromone_matrix, parameters.epsilon)
+        target_fcn = calculate_target_fcn(im_temp, im_ref)
+
+        if target_fcn > best_target_fcn:
+            best_target_fcn = target_fcn
+            im_out = im_temp
+            if is_verbose:
+                print(f'Iter: {i}, target_fcn = {best_target_fcn}')
+
+        if is_verbose and i % 50 == 0:
+            print(f'Iteration no: {i}')
+
+    print(f'Final pheromone matrix: {pheromone_matrix}')
+    return im_out
+
+
 def main():
-    in_image_path = 'input_data/house_prewitt.png'
-    ref_image_path = 'input_data/house_prewitt.png'
-    img = read_image(ref_image_path)
-    cv2.imshow('test_window', img)
-    cv2.waitKey(0)
-    print(calculate_target_fcn(in_image_path, ref_image_path))
-    variance = calculate_pix_variance(img)
-    print(variance)
 
-    ant_positions = get_random_indices(variance, 5)
-    pheromone = init_pheromone_matrix(img.shape, 0.2)
-    initial_pheromone = pheromone.copy()
-    heu = np.full(img.shape, 0.1)
-    pheromone_matrix_update(pheromone, ant_positions, heu, 0.3)
-    pheromone_matrix_decay(pheromone, initial_pheromone, 0.6)
-    T = make_decision(pheromone, 0.0001)
-    print(f'ant_positions: {ant_positions}')
-    print(f'initial pheromone: {initial_pheromone}')
-    print(f'pheromone after iteration: {pheromone}')
-    print(f'Threshold: {T}')
-
+    in_image_path = 'input_data/house_in.png'
+    ref_image_path = 'input_data/house_canny.png'
+    img_in = read_image(in_image_path)
+    img_ref = read_image(ref_image_path)
+    parameters = AlgorithmParameters(img_in)
+    img_edge = run_algorithm(img_in, img_ref, parameters, True)
+    print(f'Target fun: {calculate_target_fcn(img_edge, img_ref)}')
+    cv2.imshow('Im edge', img_edge)
     cv2.waitKey(0)
 
 
