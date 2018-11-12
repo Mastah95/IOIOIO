@@ -8,14 +8,14 @@ import numpy as np
 
 class AlgorithmParameters:
     def __init__(self, img):
-        self.alpha = 6.0
-        self.beta = 0.001
-        self.heu_matrix = np.full(img.shape, 0.1)
-        self.init_pheromones = init_pheromone_matrix(img.shape, 0.0001)
-        self.number_of_ants = int(np.sqrt((img.shape[0]*img.shape[1])))
+        self.alpha = 1.0
+        self.beta = 1.0
+        self.variance_matrix = calculate_pix_variance(img) / (calculate_pix_variance(img).max() or 1.0)
+        self.init_pheromones = init_pheromone_matrix(img.shape, 0.1)
+        self.number_of_ants = 512
         self.evaporation_rate = 0.1
         self.pheromone_decay = 0.005
-        self.max_iter = 1000
+        self.max_iter = 300
         self.epsilon = 0.01
 
 
@@ -180,10 +180,11 @@ def determine_edges(pheromone_matrix, epsilon):
     return im_edges
 
 
-def run_one_iteration(ant_matrix, pheromone_matrix, variance_matrix, algorithm_parameters):
-    move_ants(ant_matrix, pheromone_matrix, variance_matrix, algorithm_parameters.alpha, algorithm_parameters.beta)
+def run_one_iteration(ant_matrix, pheromone_matrix, algorithm_parameters):
+    move_ants(ant_matrix, pheromone_matrix, algorithm_parameters.variance_matrix,
+              algorithm_parameters.alpha, algorithm_parameters.beta)
     pheromone_matrix_update(pheromone_matrix, ant_matrix,
-                            algorithm_parameters.heu_matrix, algorithm_parameters.evaporation_rate)
+                            algorithm_parameters.variance_matrix, algorithm_parameters.evaporation_rate)
     pheromone_matrix_decay(pheromone_matrix, algorithm_parameters.init_pheromones, algorithm_parameters.pheromone_decay)
 
 
@@ -192,12 +193,11 @@ def run_algorithm(im_in, im_ref, parameters, is_verbose):
 
     ant_matrix = get_random_indices(im_in, parameters.number_of_ants)
     pheromone_matrix = parameters.init_pheromones.copy()
-    variance_matrix = calculate_pix_variance(im_in)
     best_target_fcn = 0
     im_out = np.zeros(im_in.shape, np.uint8)
 
     for i in range(0, parameters.max_iter):
-        run_one_iteration(ant_matrix, pheromone_matrix, variance_matrix, parameters)
+        run_one_iteration(ant_matrix, pheromone_matrix, parameters)
         im_temp = determine_edges(pheromone_matrix, parameters.epsilon)
         target_fcn = calculate_target_fcn(im_temp, im_ref)
 
@@ -210,7 +210,10 @@ def run_algorithm(im_in, im_ref, parameters, is_verbose):
         if is_verbose and i % 50 == 0:
             print(f'Iteration no: {i}')
 
-    print(f'Final pheromone matrix: {pheromone_matrix}')
+    for i in range(0, len(pheromone_matrix)):
+        for j in range(0, len(pheromone_matrix)):
+            if pheromone_matrix[i][j] > parameters.init_pheromones[0][0]:
+                print(f'Final pheromone matrix: {pheromone_matrix}')
     return im_out
 
 
