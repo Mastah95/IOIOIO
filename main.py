@@ -210,10 +210,6 @@ def run_algorithm(im_in, im_ref, parameters, is_verbose):
         if is_verbose and i % 50 == 0:
             print(f'Iteration no: {i}')
 
-    for i in range(0, len(pheromone_matrix)):
-        for j in range(0, len(pheromone_matrix)):
-            if pheromone_matrix[i][j] > parameters.init_pheromones[0][0]:
-                print(f'Final pheromone matrix: {pheromone_matrix}')
     return im_out
 
 
