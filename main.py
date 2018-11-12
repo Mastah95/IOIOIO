@@ -137,11 +137,9 @@ def pheromone_matrix_decay(pheromone_matrix, initial_pheromone_matrix, pheromone
                                      initial_pheromone_matrix[i][j]
 
 
-def make_decision(pheromone_matrix, epsilon):
+def calculate_threshold(pheromone_matrix, epsilon):
     """ Return a calculated threshold.
 
-    At the end of the algorithm, a binary decision has to be made at each pixel location to determine whether it
-    is edge or not, by applying a threshold on the final pheromone matrix.
     """
     threshold = np.mean(pheromone_matrix)
     i = 0
@@ -153,6 +151,17 @@ def make_decision(pheromone_matrix, epsilon):
             break
         i = i + 1
     return new_threshold
+
+
+def determine_edges(pheromone_matrix, epsilon):
+    im_edges = np.zeros(pheromone_matrix.shape, np.uint8)
+    thresh = calculate_threshold(pheromone_matrix, epsilon)
+    for i in range(0, pheromone_matrix.shape[0]):
+        for j in range(0, pheromone_matrix.shape[1]):
+            if pheromone_matrix[i][j] >= thresh:
+                im_edges[i][j] = 255
+
+    return im_edges
 
 
 def main():
