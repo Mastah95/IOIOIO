@@ -9,11 +9,11 @@ import numpy as np
 class AlgorithmParameters:
     def __init__(self, img):
         self.alpha = 1.0
-        self.beta = 1.0
+        self.beta = 2.0
         self.variance_matrix = calculate_pix_variance(img) / (calculate_pix_variance(img).max() or 1.0)
         self.init_pheromones = init_pheromone_matrix(img.shape, 0.1)
         self.number_of_ants = 512
-        self.evaporation_rate = 0.1
+        self.evaporation_rate = 0.05  # poprawiamy zbieznosc
         self.pheromone_decay = 0.005
         self.max_iter = 300
         self.epsilon = 0.01
@@ -210,19 +210,21 @@ def run_algorithm(im_in, im_ref, parameters, is_verbose):
         if is_verbose and i % 50 == 0:
             print(f'Iteration no: {i}')
 
-    return im_out
+    return im_out, pheromone_matrix
 
 
 def main():
 
     in_image_path = 'input_data/house_in.png'
-    ref_image_path = 'input_data/house_canny.png'
+    ref_image_path = 'input_data/house_prewitt.png'
     img_in = read_image(in_image_path)
     img_ref = read_image(ref_image_path)
     parameters = AlgorithmParameters(img_in)
-    img_edge = run_algorithm(img_in, img_ref, parameters, True)
+    img_edge, pheromone = run_algorithm(img_in, img_ref, parameters, True)
     print(f'Target fun: {calculate_target_fcn(img_edge, img_ref)}')
     cv2.imshow('Im edge', img_edge)
+    cv2.imshow('Ref', img_ref)
+    cv2.imshow('Pheromone', pheromone / pheromone.max())
     cv2.waitKey(0)
 
 
