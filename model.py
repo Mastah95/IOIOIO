@@ -6,56 +6,55 @@ import numpy as np
 
 class Model:
 
-    def __init__(self, img):
-        self.alpha = 1.0
-        self.beta = 2.0
-        self.variance_matrix = self.calculate_pix_variance(img) / (self.calculate_pix_variance(img).max() or 1.0)
-        self.number_of_ants = 512
-        self.evaporation_rate = 0.05
-        self.pheromone_decay = 0.005
-        self.max_iter = 300
-        self.epsilon = 0.01
+    def __init__(self, in_image, ref_image, model_parameters):
+        self.in_image = in_image
+        self.ref_image = ref_image
+        self.alpha = model_parameters["alpha"]
+        self.beta = model_parameters["beta"]
+        self.variance_matrix = self.calculate_pix_variance() / (self.calculate_pix_variance().max() or 1.0)
+        self.number_of_ants = model_parameters["number_of_ants"]
+        self.evaporation_rate = model_parameters["evaporation_rate"]
+        self.pheromone_decay = model_parameters["pheromone_decay"]
+        self.max_iter = model_parameters["max_iter"]
+        self.epsilon = model_parameters["epsilon"]
 
-    @staticmethod
-    def calculate_target_fcn(in_image, ref_image):
+    def calculate_target_fcn(self, image):
 
-        if in_image.shape != ref_image.shape:
+        if image.shape != self.ref_image.shape:
             raise ValueError('images must have the same shape')
 
         TP = TN = FP = FN = 0
-        for i in range(0, ref_image.shape[0]):
-            for j in range(0, ref_image.shape[1]):
-                if ref_image[i][j] != 0 and in_image[i][j] != 0:
+        for i in range(0, self.ref_image.shape[0]):
+            for j in range(0, self.ref_image.shape[1]):
+                if self.ref_image[i][j] != 0 and image[i][j] != 0:
                     TP += 1
-                elif ref_image[i][j] != 0 and in_image[i][j] == 0:
+                elif self.ref_image[i][j] != 0 and image[i][j] == 0:
                     FN += 1
-                elif ref_image[i][j] == 0 and in_image[i][j] == 0:
+                elif self.ref_image[i][j] == 0 and image[i][j] == 0:
                     TN += 1
-                elif ref_image[i][j] == 0 and in_image[i][j] != 0:
+                elif self.ref_image[i][j] == 0 and image[i][j] != 0:
                     FP += 1
         return TP / (TP + FP + FN)
 
-    @staticmethod
-    def calculate_pix_variance(image):
-        variance_matrix = np.zeros((image.shape[0], image.shape[1]))
-        for i in range(1, image.shape[0] - 1):  # edges to be considered later
-            for j in range(1, image.shape[1] - 1):
-                var1 = np.abs(int(image[i + 1][j]) - int(image[i - 1][j]))
-                var2 = np.abs(int(image[i][j + 1]) - int(image[i][j - 1]))
-                var3 = np.abs(int(image[i - 1][j - 1]) - int(image[i + 1][j + 1]))
-                var4 = np.abs(int(image[i - 1][j + 1]) - int(image[i + 1][j - 1]))
+    def calculate_pix_variance(self):
+        variance_matrix = np.zeros((self.in_image.shape[0], self.in_image.shape[1]))
+        for i in range(1, self.in_image.shape[0] - 1):  # edges to be considered later
+            for j in range(1, self.in_image.shape[1] - 1):
+                var1 = np.abs(int(self.in_image[i + 1][j]) - int(self.in_image[i - 1][j]))
+                var2 = np.abs(int(self.in_image[i][j + 1]) - int(self.in_image[i][j - 1]))
+                var3 = np.abs(int(self.in_image[i - 1][j - 1]) - int(self.in_image[i + 1][j + 1]))
+                var4 = np.abs(int(self.in_image[i - 1][j + 1]) - int(self.in_image[i + 1][j - 1]))
                 variance_matrix[i][j] = var1 + var2 + var3 + var4
         return variance_matrix
 
-    @staticmethod
-    def get_random_indices(arr, k):
+    def get_random_indices(self):
         """Sample k random indices of an array without replacement.
 
         Returns a k by n array, where n = arr.ndim
         """
 
-        linear_indices = np.random.choice(arr.size, k, replace=False)
-        coordinates = np.unravel_index(linear_indices, arr.shape)
+        linear_indices = np.random.choice(self.in_image.size, self.number_of_ants, replace=False)
+        coordinates = np.unravel_index(linear_indices, self.in_image.shape)
         array_of_coordinates = np.stack(tuple(coordinates), 1)
         return array_of_coordinates
 

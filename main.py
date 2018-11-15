@@ -15,12 +15,24 @@ def main():
     ref_image_path = 'input_data/house_prewitt.png'
     img_in = read_image(in_image_path)
     img_ref = read_image(ref_image_path)
-    algorithm = Algorithm(img_in, img_ref)
-    img_edge, pheromone = algorithm.run_algorithm(True)
-    print(f'Target fun: {algorithm.model.calculate_target_fcn(img_edge, img_ref)}')
+    # PARAM
+    initial_pheromone = 0.1
+    model_parameters = {
+        "alpha": 1.0,
+        "beta": 2.0,
+        "number_of_ants": 512,
+        "evaporation_rate": 0.05,
+        "pheromone_decay": 0.005,
+        "max_iter": 100,
+        "epsilon": 0.01
+    }
+    # PARAM
+    algorithm = Algorithm(img_in, img_ref, initial_pheromone, model_parameters)
+    img_edge = algorithm.run_algorithm(True)
+    print(f'Target fun: {algorithm.model.calculate_target_fcn(img_edge)}')
     cv2.imshow('Im edge', img_edge)
     cv2.imshow('Ref', img_ref)
-    cv2.imshow('Pheromone', pheromone / pheromone.max())
+    cv2.imshow('Pheromone', algorithm.pheromone_matrix / algorithm.pheromone_matrix.max())
     cv2.waitKey(0)
 
 
