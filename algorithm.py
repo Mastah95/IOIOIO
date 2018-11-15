@@ -8,9 +8,9 @@ import model
 
 class Algorithm:
 
-    def __init__(self, in_image, ref_image, init_pheromone, model_parameters):
+    def __init__(self, in_image, ref_image, model_parameters):
         self.model = model.Model(in_image, ref_image, model_parameters)
-        self.init_pheromones = self.init_pheromone_matrix(in_image.shape, init_pheromone)
+        self.init_pheromones = self.init_pheromone_matrix(in_image.shape, self.model.initial_pheromone)
         self.pheromone_matrix = self.init_pheromones.copy()
         self.ant_matrix = self.model.get_random_indices()
 

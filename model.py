@@ -17,6 +17,7 @@ class Model:
         self.pheromone_decay = model_parameters["pheromone_decay"]
         self.max_iter = model_parameters["max_iter"]
         self.epsilon = model_parameters["epsilon"]
+        self.initial_pheromone = model_parameters["initial_pheromone"]
 
     def calculate_target_fcn(self, image):
 

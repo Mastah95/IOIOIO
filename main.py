@@ -16,7 +16,6 @@ def main():
     img_in = read_image(in_image_path)
     img_ref = read_image(ref_image_path)
     # PARAM
-    initial_pheromone = 0.1
     model_parameters = {
         "alpha": 1.0,
         "beta": 2.0,
@@ -24,10 +23,11 @@ def main():
         "evaporation_rate": 0.05,
         "pheromone_decay": 0.005,
         "max_iter": 100,
-        "epsilon": 0.01
+        "epsilon": 0.01,
+        "initial_pheromone": 0.1
     }
     # PARAM
-    algorithm = Algorithm(img_in, img_ref, initial_pheromone, model_parameters)
+    algorithm = Algorithm(img_in, img_ref, model_parameters)
     img_edge = algorithm.run_algorithm(True)
     print(f'Target fun: {algorithm.model.calculate_target_fcn(img_edge)}')
     cv2.imshow('Im edge', img_edge)
