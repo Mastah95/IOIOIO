@@ -16,6 +16,7 @@ class Model:
         self.evaporation_rate = model_parameters["evaporation_rate"]
         self.pheromone_decay = model_parameters["pheromone_decay"]
         self.max_iter = model_parameters["max_iter"]
+        self.construction_steps = model_parameters["construction_steps"]
         self.epsilon = model_parameters["epsilon"]
         self.initial_pheromone = model_parameters["initial_pheromone"]
 
