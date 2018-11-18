@@ -5,7 +5,7 @@ The desire of the project is to find edges on grayscale image using ant colony a
 ### Prerequisites
 
 Program tends to be running regardless of your operating system. Thus the only requirement is running Python3 environment with following libraries installed:
- 
+
 ```
 pip install numpy
 pip install opencv-python
@@ -23,7 +23,7 @@ Get to the project location and run `main.py`
 
 ## Authors
 
-* **Szymon Kozlowski** 
+* **Szymon Kozlowski**
 * **Jarek Jalocha**
 * **Michal Piekarski**
 
