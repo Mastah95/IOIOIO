@@ -104,8 +104,9 @@ class Algorithm:
         return im_edges
 
     def run_one_iteration(self):
-        self.move_ants(self.model.variance_matrix, self.model.alpha, self.model.beta)
-        self.pheromone_matrix_update(self.model.variance_matrix, self.model.evaporation_rate)
+        for _ in range(self.model.construction_steps):
+            self.move_ants(self.model.variance_matrix, self.model.alpha, self.model.beta)
+            self.pheromone_matrix_update(self.model.variance_matrix, self.model.evaporation_rate)
         self.pheromone_matrix_decay(self.model.pheromone_decay)
 
     def run_algorithm(self, is_verbose):

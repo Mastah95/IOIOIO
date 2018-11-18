@@ -10,7 +10,6 @@ def read_image(filepath):
 
 
 def main():
-
     in_image_path = 'input_data/house_in.png'
     ref_image_path = 'input_data/house_prewitt.png'
     img_in = read_image(in_image_path)
@@ -22,7 +21,8 @@ def main():
         "number_of_ants": 512,
         "evaporation_rate": 0.05,
         "pheromone_decay": 0.005,
-        "max_iter": 100,
+        "max_iter": 10,
+        "construction_steps": 40,
         "epsilon": 0.01,
         "initial_pheromone": 0.1
     }
