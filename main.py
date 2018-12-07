@@ -21,7 +21,7 @@ def main():
         "number_of_ants": 512,
         "evaporation_rate": 0.05,
         "pheromone_decay": 0.005,
-        "max_iter": 10,
+        "max_iter": 20,
         "construction_steps": 40,
         "epsilon": 0.01,
         "initial_pheromone": 0.1

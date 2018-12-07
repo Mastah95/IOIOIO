@@ -13,6 +13,8 @@ class Algorithm:
         self.init_pheromones = self.init_pheromone_matrix(in_image.shape, self.model.initial_pheromone)
         self.pheromone_matrix = self.init_pheromones.copy()
         self.ant_matrix = self.model.get_random_indices()
+        self.randomer = random.Random()
+        self.randomer.seed(1)
 
     def get_transition_weight(self, position, alpha, beta, variance_matrix):
         """Get weight used to determine ant transition probabilities.
@@ -39,9 +41,9 @@ class Algorithm:
                    for pos in neighbours]
 
         try:
-            neighbour = random.choices(neighbours, weights)
+            neighbour = self.randomer.choices(neighbours, weights)
         except IndexError:
-            neighbour = random.choices(neighbours)
+            neighbour = self.randomer.choices(neighbours)
 
         return neighbour[0]
 
