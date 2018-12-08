@@ -2,6 +2,7 @@
 # AUTHORS: Jalocha, Kozlowski, Piekarski
 
 import numpy as np
+from skimage.measure import compare_ssim as ssim
 
 np.random.seed(1)
 
@@ -39,6 +40,12 @@ class Model:
                 elif self.ref_image[i][j] == 0 and image[i][j] != 0:
                     FP += 1
         return TP / (TP + FP + FN)
+
+    def calculate_ssim(self, image):
+        if image.shape != self.ref_image.shape:
+            raise ValueError('images must have the same shape')
+
+        return ssim(image, self.ref_image)
 
     def calculate_pix_variance(self):
         variance_matrix = np.zeros((self.in_image.shape[0], self.in_image.shape[1]))

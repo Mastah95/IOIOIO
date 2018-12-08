@@ -29,7 +29,7 @@ def main():
     # PARAM
     algorithm = Algorithm(img_in, img_ref, model_parameters)
     img_edge = algorithm.run_algorithm(True)
-    print(f'Target fun: {algorithm.model.calculate_target_fcn(img_edge)}')
+    print(f'Target fun: {algorithm.model.calculate_ssim(img_edge)}')
     cv2.imshow('Im edge', img_edge)
     cv2.imshow('Ref', img_ref)
     cv2.imshow('Pheromone', algorithm.pheromone_matrix / algorithm.pheromone_matrix.max())

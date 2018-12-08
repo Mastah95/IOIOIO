@@ -120,7 +120,7 @@ class Algorithm:
         for i in range(0, self.model.max_iter):
             self.run_one_iteration()
             im_temp = self.determine_edges(self.model.epsilon)
-            target_fcn = self.model.calculate_target_fcn(im_temp)
+            target_fcn = self.model.calculate_ssim(im_temp)
 
             if target_fcn > best_target_fcn:
                 best_target_fcn = target_fcn
