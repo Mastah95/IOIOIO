@@ -131,7 +131,7 @@ def test_decay():
         tf_temp = alg.model.calculate_ssim(img_edge)
         target_fcn_arr.append(tf_temp)
         decay_rate_arr.append(decay_rate/1000)
-        print(f'End of loop for evaporation rate={decay_rate/1000}')
+        print(f'End of loop for decay rate={decay_rate/1000}')
 
     plt.figure()
     plt.plot(decay_rate_arr, target_fcn_arr, 'r.-')
