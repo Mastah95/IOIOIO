@@ -21,7 +21,7 @@ def main():
         "number_of_ants": 512,
         "evaporation_rate": 0.05,
         "pheromone_decay": 0.005,
-        "max_iter": 10,
+        "max_iter": 20,
         "construction_steps": 40,
         "epsilon": 0.01,
         "initial_pheromone": 0.1
@@ -29,7 +29,7 @@ def main():
     # PARAM
     algorithm = Algorithm(img_in, img_ref, model_parameters)
     img_edge = algorithm.run_algorithm(True)
-    print(f'Target fun: {algorithm.model.calculate_target_fcn(img_edge)}')
+    print(f'Target fun: {algorithm.model.calculate_ssim(img_edge)}')
     cv2.imshow('Im edge', img_edge)
     cv2.imshow('Ref', img_ref)
     cv2.imshow('Pheromone', algorithm.pheromone_matrix / algorithm.pheromone_matrix.max())
