@@ -12,6 +12,7 @@ def read_image(filepath):
 def main():
     in_image_path = 'input_data/house_in.png'
     ref_image_path = 'input_data/house_prewitt.png'
+    out_image_path = 'output_data/house_prewitt_out.png'
     img_in = read_image(in_image_path)
     img_ref = read_image(ref_image_path)
     # PARAM
@@ -21,7 +22,7 @@ def main():
         "number_of_ants": 512,
         "evaporation_rate": 0.05,
         "pheromone_decay": 0.005,
-        "max_iter": 20,
+        "max_iter": 100,
         "construction_steps": 40,
         "epsilon": 0.01,
         "initial_pheromone": 0.1
@@ -33,6 +34,7 @@ def main():
     cv2.imshow('Im edge', img_edge)
     cv2.imshow('Ref', img_ref)
     cv2.imshow('Pheromone', algorithm.pheromone_matrix / algorithm.pheromone_matrix.max())
+    cv2.imwrite(out_image_path, img_edge)
     cv2.waitKey(0)
 
 
